@@ -19,14 +19,32 @@ public class DamnBigNumbers {
      * @return DamnBigNumber
      */
     public static DamnBigNumber add(DamnBigNumber a, DamnBigNumber b) {
-    String s= "";
+        if (a.getNumStr().length() < b.getNumStr().length()) {
+            for (int i =0; i<b.getNumStr().length()-a.getNumStr().length(); i++) {
+                a.setNumStr("0"+a.getNumStr());
+            }
+        } else if (a.getNumStr().length() > b.getNumStr().length()) {
+            for (int i =0; i<a.getNumStr().length()-b.getNumStr().length(); i++) {
+                b.setNumStr("0" + b.getNumStr());
+            }
+        }
 
-    for(int i = a.getNumStr().length()-1; i>=0; i--) {
-        int digitResult = a.getNumStr().charAt(i)  -48 +b.getNumStr().charAt(i) -48;
+        String s= "";
+        int carry = 0;
 
-        s = String.format("%d", digitResult) +s;
-    }
-    DamnBigNumber c= new DamnBigNumber(s);
+        for(int i = a.getNumStr().length()-1; i>=0; i--) {
+            int digitResult = a.getNumStr().charAt(i)  -48 +b.getNumStr().charAt(i) -48+carry;
+            if (digitResult >= 10) {
+                digitResult -= 10;
+                carry =1;
+            } else {
+                carry = 0;
+            }
+
+            s = String.format("%d", digitResult) +s;
+        }
+        if (carry>0) s = "1"+s;
+        DamnBigNumber c= new DamnBigNumber(s);
 
         return c;
     }
