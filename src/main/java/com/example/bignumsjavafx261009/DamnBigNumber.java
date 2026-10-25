@@ -1,5 +1,8 @@
 package com.example.bignumsjavafx261009;
 
+/**
+ * Tetszőlegesen nagy természetes szám, decimális számjegy-sztringként tárolva.
+ */
 public class DamnBigNumber {
     private String numStr = "0";
 
@@ -7,19 +10,26 @@ public class DamnBigNumber {
         return numStr;
     }
 
+    /** Csak számjegyeket fogad el (NumberFormatException különben); a vezető nullákat levágja. */
     public void setNumStr(String numStr) {
-        this.numStr = numStr;
+        this.numStr = DamnBigNumbers.normalize(numStr);
     }
 
     public DamnBigNumber() {
         setNumStr("0");
     }
+
     public DamnBigNumber(int x) {
-        setNumStr(String.format("%d", x));
+        this((long) x);
     }
+
     public DamnBigNumber(long x) {
-        setNumStr(String.format("%d", x));
+        if (x < 0) {
+            throw new IllegalArgumentException("Only natural numbers are supported: " + x);
+        }
+        setNumStr(Long.toString(x));
     }
+
     public DamnBigNumber(String xStr) {
         setNumStr(xStr);
     }
@@ -34,35 +44,40 @@ public class DamnBigNumber {
 
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj);
+        if (this == obj) return true;
+        if (!(obj instanceof DamnBigNumber)) return false;
+        return numStr.equals(((DamnBigNumber) obj).numStr);
     }
 
+    @Override
+    public int hashCode() {
+        return numStr.hashCode();
+    }
+
+    /** Hibát (NumberFormatException) jelez, ha a szám nem fér el long-ban. */
     public long getLong() {
         return Long.parseLong(getNumStr());
     }
 
-
     /**
-     * TODO increment() - What if number is damn too big?
-     * @return DamnBigNumber
+     * @return új DamnBigNumber, értéke this + 1 (az eredeti objektum nem változik)
      */
     public DamnBigNumber increment() {
-        return this;
+        return DamnBigNumbers.add(this, DBN_ONE);
     }
 
     /**
-     * TODO decrement() - What if number is damn too big?
-     * @return DamnBigNumber
+     * @return új DamnBigNumber, értéke this - 1 (0-ra ArithmeticException)
      */
     public DamnBigNumber decrement() {
-        return this;
+        return DamnBigNumbers.subtract(this, DBN_ONE);
     }
 
     /**
-     * TODO - implement isPrime
-     * @return boolean
+     * Prímteszt (Miller–Rabin; 3,3·10^24 alatt determinisztikus, afölött valószínűségi).
+     * @return true, ha a szám prím
      */
     public boolean isPrime() {
-        return false;
+        return DamnBigNumbers.isPrime(getNumStr());
     }
 }
